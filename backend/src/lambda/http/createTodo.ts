@@ -3,13 +3,16 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
 
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
-import { createGroup } from '../../businessLogic/groups'
+import { createTodo } from '../../businessLogic/todos'
 
 // TODO: middy for cors
 // TODO: xray for tracing
 // TODO: authorization
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+
+  console.log('Create todo event: ', event)
+
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
 
   console.log('Create todo: ', newTodo)
@@ -18,7 +21,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   // const split = authorization.split(' ')
   // const jwtToken = split[1]
 
-  const newItem = await createGroup(newGroup, jwtToken)
+  const newItem = await createTodo(newTodo)
 
   return {
     statusCode: 201,

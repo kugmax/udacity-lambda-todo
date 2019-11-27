@@ -6,6 +6,8 @@ plugins:
   - serverless-iam-roles-per-function
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
 
 provider:
   name: aws
@@ -40,30 +42,29 @@ iamRoleStatements:
     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.INDEX_NAME}
 
 custom:
-  topicName: imagesTopic-${self:provider.stage}
+  # topicName: imagesTopic-${self:provider.stage}
 
   serverless-offline:
     port: 3003
 
   dynamodb:
+    stages:
+      - dev
     start:
       port: 8000
       inMemory: true
       migrate: true    
 
-# documentation:
-#   api:
-#     info:
-#       version: v1.0.0
-#       title: Todo API
-#       description: Serverless todo application
-#   models:
-#     - name: GroupRequest
-#       contentType: application/json
-#       schema: ${file(models/create-group-request.json)}
-#     - name: ImageRequest
-#       contentType: application/json
-#       schema: ${file(models/create-image-request.json)}      
+documentation:
+  api:
+    info:
+      version: v1.0.0
+      title: Todo API
+      description: Serverless todo application
+  models:
+    - name: CreateTodoRequest
+      contentType: application/json
+      schema: ${file(models/create-todo-request.json)}
 
 functions:
 
@@ -86,12 +87,12 @@ functions:
           path: todos
           cors: true
 #          authorizer: RS256Auth
-          # reqValidatorName: RequestBodyValidator
-          documentation:
-            summary: Create a new todo
-            description: Create a new todo
-            requestModels:
-              'application/json': CreateTodoRequest
+          reqValidatorName: CreateTodoRequestValidator
+          # documentation:
+          #   summary: Create a new todo
+          #   description: Create a new todo
+          #   requestModels:
+          #     'application/json': CreateTodoRequest
 #    deploymentSettings:
 #      type: Linear10PercentEvery1Minute
 #      alias: Live
@@ -137,14 +138,14 @@ resources:
         RestApiId:
           Ref: ApiGatewayRestApi
 
-    # RequestBodyValidator:
-    #   Type: AWS::ApiGateway::RequestValidator
-    #   Properties:
-    #     Name: 'request-body-validator'
-    #     RestApiId:
-    #       Ref: ApiGatewayRestApi
-    #     ValidateRequestBody: true
-    #     ValidateRequestParameters: false      
+    CreateTodoRequestValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-body-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false      
 
     TodosTable:
       Type: AWS::DynamoDB::Table
