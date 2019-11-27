@@ -30,6 +30,6 @@
     "typescript": "^3.4.1",
     "webpack": "^4.29.6"
   },
-  "author": "KugMax",
+  "author": "Ivan Mushketyk",
   "license": "MIT"
 }
