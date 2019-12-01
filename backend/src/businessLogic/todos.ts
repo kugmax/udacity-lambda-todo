@@ -20,7 +20,7 @@ export async function createTodo(
 
   const itemId = uuid.v4()
 
-  return await todoStore.createTodo({
+  return await todoStore.saveOrUpdate({
     userId: "kugmax",//TODO: need use id from auth
     todoId: itemId,
     name: request.name,
@@ -38,13 +38,14 @@ export async function updateTodo(
 
   //TODO: getTodoById
 
-  let savedTodo = await todoStore.getTodo(todoId)
+  let savedTodo = await todoStore.getTodo(todoId, "kugmax")// TODO: need auth
   if (!savedTodo) {
     return null;
   }
 
-  return await todoStore.updateTodo(
-    todoId, 
+  console.log("savedTodo: ", savedTodo)
+
+  return await todoStore.saveOrUpdate(
     {
       userId: savedTodo.userId,
       todoId: savedTodo.todoId,

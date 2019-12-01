@@ -11,6 +11,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
   const updatedTodo = await updateTodo(todoId, toUpdate)
 
+  console.log("updatedTodo: ", updatedTodo)
+
   if (!updatedTodo) {
   	 return {
 	    statusCode: 404,

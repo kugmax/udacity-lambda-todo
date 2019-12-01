@@ -35,18 +35,17 @@ export class TodoStore {
     return items as TodoItem[]
   }
 
-  async getTodo(todoId: string): Promise<TodoItem> {
+  async getTodo(todoId: string, userId: string): Promise<TodoItem> {
     const result = await this.docClient.query({
         TableName: this.todosTable,
         IndexName: this.todoIndexName,
-        KeyConditionExpression: 'todoId = :todoId',
+        KeyConditionExpression: 'todoId = :todoId and userId = :userId',
         ExpressionAttributeValues: {
-          ':todoId': todoId
+          ':todoId': todoId,
+          ':userId': userId
         }
       })
       .promise()
-
-    console.log("getTodo:", result)
 
     if (result.Count == 0) {
       console.warn("Todo by id not found ", todoId)
@@ -56,33 +55,13 @@ export class TodoStore {
     return result.Items[0] as TodoItem
   }
 
-  async createTodo(todo: TodoItem): Promise<TodoItem> {
+  async saveOrUpdate(todo: TodoItem): Promise<TodoItem> {
     await this.docClient.put({
       TableName: this.todosTable,
       Item: todo
     }).promise()
 
     return todo
-  }
-
-  async updateTodo(todoId: string, newTodo: TodoItem) : Promise<TodoItem> {
-    const updateResult = await this.docClient.update({
-      TableName: this.todosTable,
-      Key: {
-        "todoId": todoId
-      },
-      UpdateExpression: "set name = :name, dueDate = :dueDate, done = :done",
-      ExpressionAttributeValues: {
-        ":name": newTodo.name,
-        ":dueDate": newTodo.dueDate,
-        ":done": newTodo.done        
-      },
-      ReturnValues:"UPDATED_NEW"
-    });
-
-    console.log("updateResult:", updateResult)
-
-    return null;
   }
 }
 
