@@ -36,8 +36,6 @@ export async function updateTodo(
   request: UpdateTodoRequest
 ): Promise<TodoItem> {
 
-  //TODO: getTodoById
-
   let savedTodo = await todoStore.getTodo(todoId, "kugmax")// TODO: need auth
   if (!savedTodo) {
     return null;
@@ -56,4 +54,14 @@ export async function updateTodo(
       attachmentUrl: savedTodo.attachmentUrl
     }
   );
+}
+
+export async function deleteTodo(todoId: string, userId: string) {
+  let todo = await todoStore.getTodo(todoId, userId)
+  if (!todo) {
+      return;
+  }
+
+
+   await todoStore.delete(todo); 
 }

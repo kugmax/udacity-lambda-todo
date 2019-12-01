@@ -63,6 +63,16 @@ export class TodoStore {
 
     return todo
   }
+
+  async delete(todo: TodoItem) {
+    await this.docClient.delete({
+      TableName: this.todosTable,
+      Key: {
+        "createdAt": todo.createdAt,
+        "userId": todo.userId
+      }
+    },logResponse)
+  }
 }
 
 function createDynamoDBClient() {
@@ -77,4 +87,9 @@ function createDynamoDBClient() {
 
 //   return new XAWS.DynamoDB.DocumentClient()
   return new AWS.DynamoDB.DocumentClient()
+}
+
+function logResponse(err, data) {
+   if (err) console.log(err, err.stack);
+   else     console.log(data);
 }
