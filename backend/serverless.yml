@@ -23,7 +23,9 @@ provider:
   environment:
     TODOS_TABLE: todos-${self:provider.stage}
     INDEX_NAME: todo-id-index-${self:provider.stage}
-
+    TODOS_ATTACHMENT_BUCKET: kugmax-todo-attachment-${self:provider.stage}
+    TODOS_ATTACHMENT_URL_EXP_SECONDS: 300
+ 
 iamRoleStatements:
   - Effect: Allow
     Action:
@@ -40,6 +42,11 @@ iamRoleStatements:
     Action:
       - dynamodb:Query
     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.INDEX_NAME}
+  - Effect: Allow
+    Action:
+      - s3:PutObject
+      - s3:GetObject
+    Resource: arn:aws:s3:::${self:provider.environment.TODOS_ATTACHMENT_BUCKET}
 
 custom:
   # topicName: imagesTopic-${self:provider.stage}
@@ -117,19 +124,15 @@ functions:
           path: todos/{todoId}
           cors: true
 
-  # TODO: Configure this function
-  # GenerateUploadUrl:
-  #   handler: src/lambda/http/generateUploadUrl.handler
-  #   events:
-  #     - http:
-  #         method: post
-  #         path: todos/{todoId}/attachment
+  GenerateUploadUrl:
+    handler: src/lambda/http/generateUploadUrl.handler
+    events:
+      - http:
+          method: post
+          path: todos/{todoId}/attachment
 
 resources:
   Resources:
-    # TODO: need s3
-    # TODO: need iam policy
-
     GatewayResponseDefault4XX:
       Type: AWS::ApiGateway::GatewayResponse
       Properties:
