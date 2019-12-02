@@ -10,12 +10,9 @@ import { createTodo } from '../../businessLogic/todos'
 // TODO: authorization
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-
-  console.log('Create todo event: ', event)
-
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
 
-  console.log('Create todo: ', newTodo)
+  console.log('Create todo v2: ', newTodo)
 
   // const authorization = event.headers.Authorization
   // const split = authorization.split(' ')
