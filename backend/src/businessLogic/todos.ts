@@ -80,9 +80,10 @@ export async function deleteTodo(todoId: string, userId: string) {
 }
 
 export function generateUploadUrl(todoId: string) {
-    return s3.getSignedUrl('putObject', {
+   return s3.getSignedUrl('putObject', {
       Bucket: todoAttachmentBucket,
       Key: todoId,
-      Expires: urlExpiration
+      Expires: urlExpiration,
+      ContentType: "image/png"
   })
 }
