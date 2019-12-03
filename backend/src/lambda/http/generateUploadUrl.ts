@@ -8,7 +8,6 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const todoId = event.pathParameters.todoId
 
   const url = generateUploadUrl(todoId)
-
    return {
     statusCode: 201,
     headers: {

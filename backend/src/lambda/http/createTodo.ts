@@ -4,6 +4,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } f
 
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 import { createTodo } from '../../businessLogic/todos'
+import { getUserId } from '../utils'
 
 // TODO: middy for cors
 // TODO: xray for tracing
@@ -14,11 +15,9 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
   console.log('Create todo v2: ', newTodo)
 
-  // const authorization = event.headers.Authorization
-  // const split = authorization.split(' ')
-  // const jwtToken = split[1]
+  const userId = getUserId(event)
 
-  const newItem = await createTodo(newTodo)
+  const newItem = await createTodo(newTodo, userId)
 
   return {
     statusCode: 201,

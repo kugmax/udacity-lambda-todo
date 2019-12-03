@@ -26,13 +26,14 @@ export async function getTodoByUserId(userId: string): Promise<TodoItem[]> {
 }
 
 export async function createTodo(
-  request: CreateTodoRequest
+  request: CreateTodoRequest,
+  userId: string
 ): Promise<TodoItem> {
 
   const todoId = uuid.v4()
 
   return await todoStore.saveOrUpdate({
-    userId: "kugmax",//TODO: need use id from auth
+    userId: userId,
     todoId: todoId,
     name: request.name,
     dueDate: request.dueDate,
@@ -44,10 +45,11 @@ export async function createTodo(
 
 export async function updateTodo(
   todoId: string,
-  request: UpdateTodoRequest
+  request: UpdateTodoRequest,
+  userId: string
 ): Promise<TodoItem> {
 
-  let savedTodo = await todoStore.getTodo(todoId, "kugmax")// TODO: need auth
+  let savedTodo = await todoStore.getTodo(todoId, userId)
   if (!savedTodo) {
     return null;
   }
