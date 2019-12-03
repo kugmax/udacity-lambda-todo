@@ -32,7 +32,7 @@ export async function createTodo(
 
   const todoId = uuid.v4()
 
-  return await todoStore.saveOrUpdate({
+  const toSave = {
     userId: userId,
     todoId: todoId,
     name: request.name,
@@ -40,7 +40,11 @@ export async function createTodo(
     done: false,
     createdAt: new Date().toISOString(),
     attachmentUrl: `https://${todoAttachmentBucket}.s3.amazonaws.com/${todoId}`
-  })
+  };
+
+    
+  await todoStore.saveOrUpdate(toSave)
+  return toSave;
 }
 
 export async function updateTodo(
