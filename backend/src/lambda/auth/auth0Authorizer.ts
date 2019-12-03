@@ -58,13 +58,15 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const token = getToken(authHeader)
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
 
+  logger.info("jwt", jwt)
+
   const certResp = await axios.get(jwksUrl)
-//TODO: need validation of keys
-  logger.debug("certResp", certResp)
+//TODO: need validation of keys useing jwt.kid
+  logger.info("certResp", certResp)
 
   const cert = certResp.data.keys[0].x5c
 
-  logger.debug("cert", cert)
+  logger.info("cert", cert)
 
 
   // TODO: Implement token verification
