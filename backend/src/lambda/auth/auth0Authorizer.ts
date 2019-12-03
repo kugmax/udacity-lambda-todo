@@ -55,24 +55,20 @@ export const handler = async (
 }
 
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
-  const token = getToken(authHeader)
-  const jwt: Jwt = decode(token, { complete: true }) as Jwt
+  const token = getToken(authHeader);
+  const jwt: Jwt = decode(token, { complete: true }) as Jwt;
 
-  logger.info("jwt", jwt)
+  logger.info("jwt", jwt);
 
-  const certResp = await axios.get(jwksUrl)
+  const certResp = await axios.get(jwksUrl);
 //TODO: need validation of keys useing jwt.kid
-  logger.info("certResp", certResp)
 
-  const cert = certResp.data.keys[0].x5c
+  const x5c = certResp.data.keys[0].x5c;
+  logger.info("x5c[0]", x5c[0]);
 
-  logger.info("cert", cert)
-
-
-  // TODO: Implement token verification
-  // You should implement it similarly to how it was implemented for the exercise for the lesson 5
-  // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-  return verify(jwt.header.kid, cert, { algorithms: ['RS256'] }) as JwtPayload
+  const pem = "-----BEGIN CERTIFICATE-----\n" + x5c[0] + "\n-----END CERTIFICATE-----\n";
+  
+  return verify(token, pem, { algorithms: ['RS256'] }) as JwtPayload;
 }
 
 function getToken(authHeader: string): string {

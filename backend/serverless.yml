@@ -36,6 +36,7 @@ provider:
         - dynamodb:Scan
         - dynamodb:PutItem
         - dynamodb:GetItem
+        - dynamodb:DeleteItem 
       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
     - Effect: Allow
       Action:
@@ -131,7 +132,7 @@ functions:
       - http:
           method: post
           path: todos/{todoId}/attachment
-          authorizer: Auth
+          cors: true
 
 resources:
   Resources:
@@ -181,3 +182,8 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+
+    AttachmentBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.TODOS_ATTACHMENT_BUCKET}
