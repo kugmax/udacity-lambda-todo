@@ -8,10 +8,6 @@ import { Jwt } from '../../auth/Jwt'
 import { JwtPayload } from '../../auth/JwtPayload'
 
 const logger = createLogger('auth')
-
-// TODO: Provide a URL that can be used to download a certificate that can be used
-// to verify JWT token signature.
-// To get this URL you need to go to an Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
 const jwksUrl = 'https://dev-tpqi4clb.auth0.com/.well-known/jwks.json'
 
 export const handler = async (
@@ -61,10 +57,7 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   logger.info("jwt", jwt);
 
   const certResp = await axios.get(jwksUrl);
-//TODO: need validation of keys useing jwt.kid
-
   const x5c = certResp.data.keys[0].x5c;
-  logger.info("x5c[0]", x5c[0]);
 
   const pem = "-----BEGIN CERTIFICATE-----\n" + x5c[0] + "\n-----END CERTIFICATE-----\n";
   
