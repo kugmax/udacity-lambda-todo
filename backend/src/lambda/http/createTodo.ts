@@ -11,8 +11,6 @@ import { createLogger } from '../../utils/logger'
 
 const logger = createLogger('create')
 
-// TODO: each function has it's own set of permissions
-
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
 

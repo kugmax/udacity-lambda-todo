@@ -7,6 +7,7 @@ plugins:
   - serverless-offline
   - serverless-reqvalidator-plugin
   - serverless-aws-documentation
+  - serverless-iam-roles-per-function
 
 provider:
   name: aws
@@ -25,32 +26,7 @@ provider:
     TODOS_ATTACHMENT_BUCKET: kugmax-todo-attachment-${self:provider.stage}
     TODOS_ATTACHMENT_URL_EXP_SECONDS: 300
  
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - codedeploy:*
-      Resource:
-        - '*'
-    - Effect: Allow
-      Action:
-        - dynamodb:Scan
-        - dynamodb:PutItem
-        - dynamodb:GetItem
-        - dynamodb:DeleteItem 
-      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.INDEX_NAME}
-    - Effect: Allow
-      Action:
-        - s3:PutObject
-        - s3:GetObject
-      Resource: arn:aws:s3:::${self:provider.environment.TODOS_ATTACHMENT_BUCKET}/*
-
 custom:
-  # topicName: imagesTopic-${self:provider.stage}
-
   serverless-offline:
     port: 3003
 
@@ -88,6 +64,11 @@ functions:
           method: get
           path: todos
           cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.INDEX_NAME}
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
@@ -103,9 +84,11 @@ functions:
             description: Create a new todo
             requestModels:
               'application/json': CreateTodoRequest
-#    deploymentSettings:
-#      type: Linear10PercentEvery1Minute
-#      alias: Live
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
@@ -116,6 +99,15 @@ functions:
           cors: true
           authorizer: Auth
           reqValidatorName: BodyTodoRequestValidator
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.INDEX_NAME}
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
@@ -125,6 +117,15 @@ functions:
           path: todos/{todoId}
           cors: true
           authorizer: Auth
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.INDEX_NAME}
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem 
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
@@ -133,6 +134,12 @@ functions:
           method: post
           path: todos/{todoId}/attachment
           cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.TODOS_ATTACHMENT_BUCKET}/*
 
 resources:
   Resources:
