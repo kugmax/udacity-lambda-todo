@@ -7,17 +7,21 @@ import { createTodo } from '../../businessLogic/todos'
 import { getUserId } from '../utils'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
+import { createLogger } from '../../utils/logger'
 
-// TODO: xray for tracing
+const logger = createLogger('create')
+
+// TODO: each function has it's own set of permissions
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
 
-  console.log('Create todo v2: ', newTodo)
+  logger.info('Create todo: ', newTodo)
 
   const userId = getUserId(event)
 
   const newItem = await createTodo(newTodo, userId)
+  logger.info('New todo created:', newItem)
 
   return {
     statusCode: 201,

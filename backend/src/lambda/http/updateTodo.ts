@@ -7,6 +7,9 @@ import { updateTodo } from '../../businessLogic/todos'
 import { getUserId } from '../utils'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('update')
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const todoId = event.pathParameters.todoId
@@ -15,13 +18,13 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
 
   const updatedTodo = await updateTodo(todoId, toUpdate, userId)
 
-  console.log("updatedTodo: ", updatedTodo)
+  logger.info("Update todo:", updatedTodo)
 
   if (!updatedTodo) {
-  	 return {
-	    statusCode: 404,
-	    body: ''
-	  }
+     return {
+	     statusCode: 404,
+	     body: ''
+     }
   }
 
   return {

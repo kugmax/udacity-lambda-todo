@@ -1,7 +1,6 @@
 import * as uuid from 'uuid'
 
 import { TodoItem } from '../models/TodoItem'
-// import { TodoUpdate } from '../models/TodoUpdate'
 
 import { TodoStore } from '../store/todoStore'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
@@ -9,8 +8,10 @@ import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 
 import * as AWS  from 'aws-sdk'
 import * as AWSXRay from 'aws-xray-sdk'
-// import { getUserId } from '../auth/utils'
 
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('todoLogic')
 const todoStore = new TodoStore()
 
 const XAWS = AWSXRay.captureAWS(AWS)
@@ -58,7 +59,7 @@ export async function updateTodo(
     return null;
   }
 
-  console.log("savedTodo: ", savedTodo)
+  logger.info("savedTodo: ", savedTodo)
 
   return await todoStore.saveOrUpdate(
     {

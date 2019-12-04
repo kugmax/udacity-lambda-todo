@@ -1,7 +1,9 @@
 import * as AWS  from 'aws-sdk'
 import * as AWSXRay from 'aws-xray-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
+import { createLogger } from '../utils/logger'
 
+const logger = createLogger('store')
 const XAWS = AWSXRay.captureAWS(AWS)
 
 import { TodoItem } from '../models/TodoItem'
@@ -17,8 +19,6 @@ export class TodoStore {
   }
 
   async getTodoByUserId(userId: string): Promise<TodoItem[]> {
-    console.log('Getting todo by userId')
-
     const result = await this.docClient.query({
         TableName: this.todosTable,
         IndexName: this.todoIndexName,
@@ -29,7 +29,7 @@ export class TodoStore {
       })
       .promise()
 
-    console.log("getTodos:", result)
+    logger.info("getTodos:", result)
 
     const items = result.Items
     return items as TodoItem[]
@@ -48,7 +48,7 @@ export class TodoStore {
       .promise()
 
     if (result.Count == 0) {
-      console.warn("Todo by id not found ", todoId)
+      logger.warn("Todo by id not found ", todoId)
       return null;
     }
 
@@ -77,7 +77,7 @@ export class TodoStore {
 
 function createDynamoDBClient() {
   if (process.env.IS_OFFLINE) {
-    console.log('Creating a local DynamoDB instance')
+    logger.info('Creating a local DynamoDB instance')
     return new XAWS.DynamoDB.DocumentClient({
       region: 'localhost',
       endpoint: 'http://localhost:8000'
@@ -88,6 +88,7 @@ function createDynamoDBClient() {
 }
 
 function logResponse(err, data) {
-   if (err) console.log(err, err.stack);
-   else     console.log(data);
+   if (err) logger.error(err, err.stack);
+   else     logger.info(data);
+
 }
